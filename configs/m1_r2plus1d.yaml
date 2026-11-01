@@ -1,0 +1,6 @@
+# Owner: TV1
+_base_: base.yaml
+model:
+  name: r2plus1d_18
+  pretrained: true
+  mode: cls        # cls | mil

@@ -1,0 +1,31 @@
+# Cấu hình chung — KHÔNG đổi sau Tuần 1 (giao thức thí nghiệm cố định)
+seed: 42
+data:
+  frames_root: data/raw/ucf_crime          # ảnh Kaggle: Train/<Class>/*.png, Test/<Class>/*.png
+  temporal_ann: data/annotations/Temporal_Anomaly_Annotation_for_Testing_Videos.txt
+  split_dir: data/processed/splits          # train/val/test list (val tách 10% từ train, theo video)
+  frame_step: 10                            # Kaggle lấy 1/10 frame
+  clip_len: 16
+  clip_stride: 8
+  input_size: 112
+  num_classes: 14
+  normal_class: NormalVideos
+train:
+  epochs: 20
+  batch_size: 16
+  lr: 1.0e-4
+  weight_decay: 1.0e-4
+  optimizer: adamw
+  scheduler: cosine
+  amp: true
+  num_workers: 4
+  freeze: none                              # none | backbone | partial
+mil:
+  num_segments: 32
+  lambda_smooth: 8.0e-5
+  lambda_sparse: 8.0e-5
+eval:
+  fpr_threshold: 0.5
+logging:
+  wandb_project: ucf-crime-vad
+  out_dir: results/logs

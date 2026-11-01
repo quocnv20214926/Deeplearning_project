@@ -1,0 +1,6 @@
+# Owner: TV1
+_base_: base.yaml
+model:
+  name: mobilenet_gru
+  pretrained: true
+  mode: cls        # cls | mil

@@ -1,0 +1,7 @@
+# Owner: TV4
+_base_: base.yaml
+model:
+  name: x3d_s
+  pretrained: true
+  mode: cls        # cls | mil
+  # X3D-S chuẩn: clip 13 frame, 160px — ablation

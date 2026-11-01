@@ -1,0 +1,7 @@
+# Owner: TV3
+_base_: base.yaml
+model:
+  name: swin3d_t
+  pretrained: true
+  mode: cls        # cls | mil
+  # Swin/I3D thử thêm input_size 224 trong ablation
