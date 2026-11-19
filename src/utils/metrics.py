@@ -137,3 +137,31 @@ def clips_to_frame(clip_scores, num_frames, clip_len=16, stride=8) -> np.ndarray
         miss = np.flatnonzero(~covered)
         out[miss] = out[ci[np.abs(miss[:, None] - ci[None, :]).argmin(axis=1)]]
     return out
+
+
+# --------------------------------------------------------------------------- #
+# Video-level (cross-dataset, vd RWF-2000: chỉ có nhãn cả clip)
+# --------------------------------------------------------------------------- #
+def video_scores(scores: dict, agg="max", k=3) -> dict:
+    """Gộp điểm frame -> 1 điểm/video. agg: 'max' | 'topk_mean' | 'mean'."""
+    out = {}
+    for v, s in scores.items():
+        s = np.asarray(s, dtype=float)
+        if agg == "max":
+            out[v] = float(s.max())
+        elif agg == "mean":
+            out[v] = float(s.mean())
+        elif agg == "topk_mean":
+            out[v] = float(np.sort(s)[-min(k, len(s)):].mean())
+        else:
+            raise ValueError(f"agg không hợp lệ: {agg}")
+    return out
+
+
+def video_auc(scores: dict, video_labels: dict, agg="max", k=3) -> float:
+    """AUC mức video. video_labels: {video: 0/1}."""
+    vs = video_scores(scores, agg, k)
+    vids = sorted(video_labels)
+    y = np.array([video_labels[v] for v in vids], dtype=int)
+    _check_two_classes(y)
+    return float(roc_auc_score(y, [vs[v] for v in vids]))
