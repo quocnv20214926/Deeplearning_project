@@ -93,3 +93,13 @@ def test_clips_to_frame_length_and_overlap():
 def test_clips_to_frame_tail_filled():
     out = M.clips_to_frame([0.2], num_frames=20, clip_len=16, stride=8)
     assert len(out) == 20 and np.all(out == 0.2)
+
+
+def test_video_auc_perfect_and_aggregations():
+    scores = {"a": np.array([0.1, 0.9, 0.2]), "b": np.array([0.1, 0.2, 0.1]),
+              "c": np.array([0.2, 0.8]), "d": np.array([0.3, 0.1])}
+    vl = {"a": 1, "b": 0, "c": 1, "d": 0}
+    assert M.video_auc(scores, vl, "max") == 1.0
+    assert M.video_auc(scores, vl, "topk_mean", k=2) == 1.0
+    assert M.video_scores(scores, "max")["a"] == 0.9
+    assert abs(M.video_scores(scores, "mean")["b"] - (0.4 / 3)) < 1e-9
