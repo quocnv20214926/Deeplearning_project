@@ -103,8 +103,7 @@ def main():
     print(f"Số frame/clip sau lấy mẫu: min={nf.min()} median={int(np.median(nf))} max={nf.max()}")
     short = int((nf < args.clip_len).sum())
     if short:
-        print(f"CẢNH BÁO: {short} clip có < {args.clip_len} frame (clip_len) -> evaluate sẽ lặp frame cuối; "
-              f"thống nhất cách xử lý với TV1/TV3.")
+        print(f"CẢNH BÁO: {short} clip có < {args.clip_len} frame (clip_len) -> UCFCrimeClips của TV1 lặp frame cuối (cùng quy tắc cho mọi dataset), không cần xử lý thêm.")
     if bad:
         print(f"Không đọc được {len(bad)} file:", *bad[:5], sep="\n  ")
 
