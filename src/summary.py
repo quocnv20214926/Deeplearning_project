@@ -5,6 +5,7 @@ AUC/FPR lấy từ lần chạy evaluate.py (mặc định có AMP fp16 trên GP
 """
 import csv
 import json
+import shutil
 from pathlib import Path
 
 COLUMNS = ["model", "mode", "precision", "device", "gpu", "frame_auc", "fpr", "normal_video_fpr",
@@ -48,3 +49,32 @@ def build_summary(tables_dir="results/tables", out_csv="results/tables/summary.c
         w.writeheader()
         w.writerows(rows)
     return rows
+
+
+def needs_eval(json_path, force=False) -> bool:
+    """True nếu chưa có kết quả end-to-end (từ evaluate.py): chưa có file, hoặc file do train_mil.py (TV3)
+    ghi từ feature (source == "features")."""
+    p = Path(json_path)
+    if force or not p.exists():
+        return True
+    try:
+        return json.loads(p.read_text(encoding="utf-8")).get("source") == "features"
+    except (ValueError, OSError):
+        return True
+
+
+def keep_feature_result(tables_dir, tag):
+    """Trước khi evaluate.py ghi đè <tag>_mil.json: lưu bản chấm từ feature thành <tag>_mil_features.json
+    (để so khớp với kết quả end-to-end). Trả đường dẫn bản lưu hoặc None."""
+    tables = Path(tables_dir)
+    src = tables / f"{tag}_mil.json"
+    if not src.exists():
+        return None
+    try:
+        if json.loads(src.read_text(encoding="utf-8")).get("source") != "features":
+            return None
+    except (ValueError, OSError):
+        return None
+    dst = tables / f"{tag}_mil_features.json"
+    shutil.copy(src, dst)
+    return dst
