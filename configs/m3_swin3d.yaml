@@ -4,4 +4,11 @@ model:
   name: swin3d_t
   pretrained: true
   mode: cls        # cls | mil
+  grad_checkpointing: false   # bật nếu thiếu VRAM (chậm hơn ~30%)
   # Swin/I3D thử thêm input_size 224 trong ablation
+# Chỉ ghi đè phần riêng của Swin (Transformer nặng hơn 3D-CNN); giao thức data/eval giữ nguyên base.yaml
+train:
+  batch_size: 8
+  grad_accum: 2      # batch hiệu dụng 16 = base.yaml
+  lr: 5.0e-5
+  warmup_epochs: 1
