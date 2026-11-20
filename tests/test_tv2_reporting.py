@@ -117,3 +117,35 @@ def test_ablation_variant_parser():
         except ValueError:
             continue
         raise AssertionError("phải báo lỗi")
+
+
+def test_needs_eval_and_keep_feature_result():
+    with tempfile.TemporaryDirectory() as d:
+        t = Path(d)
+        assert S.needs_eval(t / "x_mil.json")                                  # chưa có file
+        (t / "x_mil.json").write_text(json.dumps({"source": "features", "frame_auc": 0.7}))
+        assert S.needs_eval(t / "x_mil.json")                                  # do train_mil ghi -> chấm lại
+        kept = S.keep_feature_result(t, "x")
+        assert kept == t / "x_mil_features.json" and json.loads(kept.read_text())["frame_auc"] == 0.7
+        (t / "x_mil.json").write_text(json.dumps({"source": "frames", "frame_auc": 0.71}))
+        assert not S.needs_eval(t / "x_mil.json") and S.needs_eval(t / "x_mil.json", force=True)
+        assert S.keep_feature_result(t, "x") is None                           # đã end-to-end: không lưu đè
+        (t / "old_cls.json").write_text(json.dumps({"frame_auc": 0.8}))        # JSON cũ không có "source"
+        assert not S.needs_eval(t / "old_cls.json")
+
+
+def test_mil_commands_use_per_variant_feature_dir_and_tag():
+    spec = importlib.util.spec_from_file_location("run_ablation", ROOT / "scripts" / "run_ablation.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    sets = ["--set", "train.freeze=partial", "data.frames_root=/x"]
+    ext, trn = mod.build_mil_commands("py", "configs/m2_i3d.yaml", sets, "i3d_r50_partial", "i3d_r50", device="cuda")
+    assert ext[ext.index("--ckpt") + 1] == "weights/i3d_r50_partial_cls.pt"
+    assert ext[ext.index("--out_root") + 1] == "data/features/i3d_r50_partial"
+    assert trn[trn.index("--features") + 1] == "data/features/i3d_r50_partial/i3d_r50"
+    assert trn[trn.index("--tag") + 1] == "i3d_r50_partial" and "--overwrite" not in ext
+    assert ext[-len(sets):] == sets and trn[-len(sets):] == sets            # --set nằm cuối, không nuốt cờ khác
+    ext2, _ = mod.build_mil_commands("py", "c.yaml", sets, "t", "m", retrain=True)
+    assert "--overwrite" in ext2 and ext2[-len(sets):] == sets
+    ext3, _ = mod.build_mil_commands("py", "c.yaml", [], "t", "m", retrain=True)
+    assert ext3[-1] == "--overwrite"
