@@ -43,6 +43,12 @@ def _clean(x):
     return x
 
 
+def load_labels(path):
+    """test_frame_labels.npz -> {video: nhãn 0/1 từng ảnh}. train_mil.py (TV3) cũng import hàm này."""
+    d = np.load(path, allow_pickle=True)
+    return {k: np.asarray(d[k]).astype(int) for k in d.files}
+
+
 def check_alignment(n_frames: dict, labels: dict):
     """n_frames: {video: số ảnh} theo split của TV1; labels: {video: nhãn từng ảnh}."""
     a, b = set(n_frames), set(labels)
@@ -120,8 +126,7 @@ def run_model_eval(cfg, args):
     normal_id = normal_index(class_names, NORMAL)
 
     n_frames = {v: n for v, _, n in read_split(cfg, "test")}
-    lab = np.load(data_paths(cfg)["test_labels"], allow_pickle=True)
-    labels = {k: np.asarray(lab[k]).astype(int) for k in lab.files}
+    labels = load_labels(data_paths(cfg)["test_labels"])
     check_alignment(n_frames, labels)
 
     ds = UCFCrimeClips(cfg, "test", build_eval_transform(cfg), store=build_store(cfg), stride=args.stride)
@@ -204,7 +209,7 @@ def main():
 
     res = evaluate_scores(scores, labels, vclass, cfg["eval"]["fpr_threshold"], normal, ti, pi)
     res.update({"model": tag, "mode": args.mode, "ckpt": args.ckpt, "stride": args.stride,
-                "amp": (not args.no_amp) and not args.dummy})
+                "amp": (not args.no_amp) and not args.dummy, "source": "frames"})
     path = write_outputs(res, scores, tag, args.mode, args.out_dir)
     print(f"frame AUC = {res['frame_auc']:.4f} | acc14 = {res.get('acc_14cls')} -> {path}")
 
