@@ -2,7 +2,8 @@
 Quy ước đo: batch=1, 1 clip (3 x clip_len x input_size x input_size), warm-up rồi đo `iters` lần.
 Mỗi cấu hình nên chạy trong 1 process riêng (để RAM/VRAM không bị nhiễm từ lần chạy trước).
 
-    python -m src.benchmark --config configs/m1_r2plus1d.yaml --ckpt weights/r2plus1d_18_cls.pt --mode cls --precision fp32
+    python -m src.benchmark --config configs/m1_r2plus1d.yaml --precision fp32          # không cần ckpt
+    python -m src.benchmark --config configs/m1_r2plus1d.yaml --ckpt weights/r2plus1d_18_cls.pt --precision fp32
     python -m src.benchmark --config ... --mode cls --precision fp16 --device cuda
     python -m src.benchmark --config ... --mode cls --precision onnx --onnx weights/r2plus1d_18_cls.onnx
 
@@ -16,7 +17,7 @@ from pathlib import Path
 
 import numpy as np
 
-from src.utils.model_io import load_cfg
+from src.utils.config import load_config
 
 
 def summarize_latencies(times_ms, clip_len=16):
@@ -78,8 +79,9 @@ def bench_onnx(path, shape, warmup, iters, device):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--config", default="configs/base.yaml")
-    ap.add_argument("--ckpt")
+    ap.add_argument("--config", required=True)
+    ap.add_argument("--set", nargs="*", default=[], metavar="KHOA=GIA_TRI")
+    ap.add_argument("--ckpt", help="tuỳ chọn: tốc độ/VRAM không phụ thuộc trọng số; có ckpt thì báo thêm kích thước file")
     ap.add_argument("--mode", choices=["cls", "mil"], default="cls")
     ap.add_argument("--precision", choices=["fp32", "fp16", "onnx"], default="fp32")
     ap.add_argument("--onnx", help="đường dẫn .onnx khi --precision onnx")
@@ -90,7 +92,7 @@ def main():
     ap.add_argument("--out_dir", default="results/tables")
     args = ap.parse_args()
 
-    cfg = load_cfg(args.config)
+    cfg = load_config(args.config, args.set)
     d = cfg["data"]
     shape = (1, 3, d["clip_len"], d["input_size"], d["input_size"])
     tag = args.tag or Path(args.config).stem
@@ -107,12 +109,15 @@ def main():
     else:
         import torch
 
-        from src.utils.model_io import load_model
+        from src.utils.model_io import build_video_model, load_model   # TV3
 
         device = args.device or ("cuda" if torch.cuda.is_available() else "cpu")
         if args.precision == "fp16" and device == "cpu":
             raise SystemExit("fp16 cần GPU (--device cuda)")
-        model = load_model(cfg, args.mode, args.ckpt, device)
+        if args.ckpt:
+            model = load_model(cfg, args.mode, args.ckpt, device)
+        else:  # tốc độ/VRAM không phụ thuộc giá trị trọng số
+            model = build_video_model(cfg, args.mode, pretrained=False)[0].to(device).eval()
         x = torch.randn(*shape, device=device)
         if args.precision == "fp16":
             model, x = model.half(), x.half()
