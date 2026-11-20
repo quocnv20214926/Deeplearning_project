@@ -103,3 +103,29 @@ def test_video_auc_perfect_and_aggregations():
     assert M.video_auc(scores, vl, "topk_mean", k=2) == 1.0
     assert M.video_scores(scores, "max")["a"] == 0.9
     assert abs(M.video_scores(scores, "mean")["b"] - (0.4 / 3)) < 1e-9
+
+
+def _ref_clip_starts(n_frames, clip_len, stride):
+    """Bản sao logic clip_starts của TV1 (src/data/ucf_crime.py) để kiểm tra tích hợp."""
+    last = max(n_frames - clip_len, 0)
+    starts = list(range(0, last + 1, stride))
+    if starts[-1] != last:
+        starts.append(last)
+    return starts
+
+
+def test_clips_to_frame_with_explicit_starts_covers_every_frame():
+    for n in (5, 16, 17, 53, 100):
+        starts = _ref_clip_starts(n, 16, 16)               # test_clip_stride mặc định = clip_len
+        out = M.clips_to_frame(np.linspace(0.1, 0.9, len(starts)), n, 16, starts=starts)
+        assert len(out) == n and np.isfinite(out).all()
+
+
+def test_clips_to_frame_last_clip_overlap_is_averaged():
+    out = M.clips_to_frame([0.0, 1.0], 20, 16, starts=[0, 4])   # frame 4..15 do cả 2 clip phủ
+    assert out[0] == 0.0 and out[10] == 0.5 and out[19] == 1.0
+
+
+def test_clips_to_frame_start_count_mismatch_raises():
+    with pytest.raises(ValueError):
+        M.clips_to_frame([0.1, 0.2], 20, 16, starts=[0])
