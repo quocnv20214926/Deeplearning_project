@@ -203,7 +203,8 @@ def main():
         print(f"Inference xong sau {time.time() - t0:.0f}s")
 
     res = evaluate_scores(scores, labels, vclass, cfg["eval"]["fpr_threshold"], normal, ti, pi)
-    res.update({"model": tag, "mode": args.mode, "ckpt": args.ckpt, "stride": args.stride})
+    res.update({"model": tag, "mode": args.mode, "ckpt": args.ckpt, "stride": args.stride,
+                "amp": (not args.no_amp) and not args.dummy})
     path = write_outputs(res, scores, tag, args.mode, args.out_dir)
     print(f"frame AUC = {res['frame_auc']:.4f} | acc14 = {res.get('acc_14cls')} -> {path}")
 
