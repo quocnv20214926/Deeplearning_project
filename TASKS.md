@@ -25,13 +25,13 @@
 ## TV1 — Dữ liệu + R(2+1)D-18 + MobileNetV3-GRU
 
 **Tuần 1 — Dữ liệu**
-- [ ] Tải Kaggle UCF-Crime vào `data/raw/ucf_crime/`; tải file nhãn thời gian vào `data/annotations/`
-- [ ] `scripts/prepare_data.py`: nhóm ảnh theo video, kiểm tra thiếu/lỗi, tạo split train/val (90/10 theo video) /test → `data/processed/splits/`
-- [ ] Map ảnh test ↔ nhãn frame (`src/data/annotations.py`), lưu `test_frame_labels.npz`; kiểm tra khớp 290 video test
-- [ ] `notebooks/01_eda.ipynb`: phân bố lớp, độ dài video, tỉ lệ frame bất thường, ảnh mẫu → **hình cho báo cáo**
+- [x] Tải Kaggle UCF-Crime vào `data/raw/ucf_crime/`; tải file nhãn thời gian vào `data/annotations/`
+- [x] `scripts/prepare_data.py`: nhóm ảnh theo video, kiểm tra thiếu/lỗi, tạo split train/val (90/10 theo video) /test → `data/processed/splits/`
+- [x] Map ảnh test ↔ nhãn frame (`src/data/annotations.py`), lưu `test_frame_labels.npz`; kiểm tra khớp 290 video test
+- [x] `notebooks/01_eda.ipynb`: phân bố lớp, độ dài video, tỉ lệ frame bất thường, ảnh mẫu → **hình cho báo cáo**
 
 **Tuần 2 — Dataloader + baseline**
-- [ ] `src/data/ucf_crime.py` (clip 16 frame, stride 8), `transforms.py` (train/eval), sampler cân bằng → **bàn giao cho cả nhóm đầu tuần 2**
+- [x] `src/data/ucf_crime.py` (clip 16 frame, stride 8), `transforms.py` (train/eval), sampler cân bằng → **bàn giao cho cả nhóm đầu tuần 2**
 - [ ] Fine-tune **M1 R(2+1)D-18** chế độ cls (dùng `train.py` của TV3) → `weights/r2plus1d_18_cls.pt`
 - [ ] Chạy `evaluate.py` cho M1 → kết quả baseline đầu tiên
 

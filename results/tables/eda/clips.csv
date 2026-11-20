@@ -1,0 +1,4 @@
+subset,videos,normal_videos,anomaly_videos,frames,clips,anomaly_clips,anomaly_clip_pct
+train,1449,720,729,1177438,40592,23176,57.1
+val,161,80,81,88907,4397,2591,58.9
+test,290,150,140,111308,7089,2960,41.8
