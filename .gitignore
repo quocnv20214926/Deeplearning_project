@@ -16,3 +16,4 @@ __pycache__/
 *.pt
 *.pth
 .env
+!data/processed/splits/

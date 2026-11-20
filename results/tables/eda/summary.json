@@ -1,0 +1,18 @@
+{
+ "videos": 1900,
+ "frames": 1377653,
+ "hours": 127.6,
+ "normal_frame_pct": 73.5,
+ "longest_video": "Normal_Videos308_x264",
+ "longest_hours": 9.0,
+ "pixel_mean": [
+  0.3478,
+  0.3438,
+  0.3382
+ ],
+ "pixel_std": [
+  0.2741,
+  0.2738,
+  0.2736
+ ]
+}

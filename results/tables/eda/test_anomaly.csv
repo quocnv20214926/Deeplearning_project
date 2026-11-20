@@ -1,0 +1,16 @@
+,frames,anomalous,pct
+NormalVideos,64952,0,0.0
+Abuse,297,17,5.72
+Arrest,3365,783,23.27
+Arson,2793,823,29.47
+Assault,2657,854,32.14
+Burglary,7657,1623,21.2
+Explosion,6510,778,11.95
+Fighting,1231,448,36.39
+RoadAccidents,2663,243,9.13
+Robbery,835,385,46.11
+Shooting,7630,997,13.07
+Shoplifting,7623,775,10.17
+Stealing,1984,607,30.59
+Vandalism,1111,215,19.35
+TOTAL,111308,8548,7.68
