@@ -8,6 +8,8 @@
 Tự tìm weights/*_cls.pt và weights/*_mil.pt; cấu hình lấy từ chính checkpoint (cfg lúc train) nên khớp với
 model đã train. Nếu checkpoint train ở máy khác (đường dẫn dữ liệu khác) thêm `--set data.frames_root=...`.
 Mỗi benchmark chạy trong process riêng (RAM/VRAM sạch). Bước đã có kết quả sẽ được bỏ qua (dùng --force để chạy lại).
+Kết quả MIL do train_mil.py ghi (source=features) sẽ được chấm lại end-to-end bằng evaluate.py và ghi đè
+(bản cũ lưu ở <tag>_mil_features.json).
 fp16 chỉ chạy khi có GPU; onnx chỉ chạy khi có <onnx_dir>/<tag>_<mode>.onnx (TV4 xuất từ export_onnx.py).
 """
 import argparse
@@ -19,7 +21,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from src.summary import build_summary  # noqa: E402
+from src.summary import build_summary, keep_feature_result, needs_eval  # noqa: E402
 
 
 def discover(weights_dir, only):
@@ -74,7 +76,8 @@ def main():
         print(f"{len(runs)} checkpoint: {[r['tag'] + '/' + r['mode'] for r in runs]}")
         for r in runs:
             base = ["--config", r["cfg"], "--ckpt", r["ckpt"], "--mode", r["mode"], "--tag", r["tag"]]
-            if not args.no_eval and (args.force or not (tables / f"{r['tag']}_{r['mode']}.json").exists()):
+            if not args.no_eval and needs_eval(tables / f"{r['tag']}_{r['mode']}.json", args.force):
+                keep_feature_result(tables, r["tag"]) if r["mode"] == "mil" else None
                 if run([sys.executable, "-m", "src.evaluate", *base, *extra]):
                     failures.append(f"evaluate {r['tag']}/{r['mode']}")
             for prec in args.precisions:
