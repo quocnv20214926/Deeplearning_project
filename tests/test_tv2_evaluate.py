@@ -80,3 +80,16 @@ def test_assemble_mil_has_no_class_predictions():
     scores, true_id, pred_id = E.assemble(items, np.array([0.2, 0.6]), None, n_frames, 16)
     assert len(scores["a"]) == 20 and true_id == {"a": 2} and pred_id == {}
     assert scores["a"][0] == 0.2 and abs(scores["a"][10] - 0.4) < 1e-9 and scores["a"][19] == 0.6
+
+
+def test_names_imported_by_tv3_train_mil_exist():
+    """train_mil.py (TV3) cần các tên này từ src.evaluate; không được xoá/đổi."""
+    from src.evaluate import evaluate_scores, load_labels, write_outputs  # noqa: F401
+
+
+def test_load_labels_roundtrip_uint8_to_int():
+    with tempfile.TemporaryDirectory() as d:
+        p = Path(d) / "labels.npz"
+        np.savez_compressed(p, a_x264=np.array([0, 1, 1], np.uint8), b_x264=np.zeros(4, np.uint8))
+        lab = E.load_labels(p)
+        assert set(lab) == {"a_x264", "b_x264"} and lab["a_x264"].dtype.kind == "i" and lab["a_x264"].sum() == 2
