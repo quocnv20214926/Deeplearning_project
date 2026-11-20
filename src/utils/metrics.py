@@ -115,16 +115,22 @@ def snippet_to_frame(snippet_scores, num_frames) -> np.ndarray:
     return snippet_scores[np.clip(idx, 0, len(snippet_scores) - 1)]
 
 
-def clips_to_frame(clip_scores, num_frames, clip_len=16, stride=8) -> np.ndarray:
-    """Cls: clip k phủ frame [k*stride, k*stride+clip_len). Điểm frame = trung bình
-    các clip phủ nó; frame không clip nào phủ (đuôi video) lấy điểm clip gần nhất."""
+def clips_to_frame(clip_scores, num_frames, clip_len=16, stride=8, starts=None) -> np.ndarray:
+    """Cls: clip phủ frame [start, start+clip_len). Điểm frame = trung bình các clip phủ nó;
+    frame không clip nào phủ lấy điểm clip gần nhất.
+    starts=None -> clip k bắt đầu tại k*stride; nếu không truyền vị trí thật (vd. ds.items của
+    UCFCrimeClips, có clip cuối căn theo cuối video)."""
     clip_scores = np.asarray(clip_scores, dtype=float)
+    if starts is None:
+        starts = [k * stride for k in range(len(clip_scores))]
+    if len(starts) != len(clip_scores):
+        raise ValueError(f"{len(clip_scores)} điểm clip nhưng {len(starts)} vị trí bắt đầu")
     acc = np.zeros(num_frames)
     cnt = np.zeros(num_frames)
-    for k, sc in enumerate(clip_scores):
-        a, b = k * stride, min(k * stride + clip_len, num_frames)
+    for sc, a in zip(clip_scores, starts):
         if a >= num_frames:
-            break
+            continue
+        b = min(a + clip_len, num_frames)
         acc[a:b] += sc
         cnt[a:b] += 1
     out = np.empty(num_frames)
