@@ -80,13 +80,13 @@
 ## TV3 — Training framework & MIL + Video Swin-T
 
 **Tuần 1**
-- [ ] `src/utils/config.py` (đã có), `src/train.py`: vòng train AMP, AdamW + cosine, early stopping theo val AUC, lưu best checkpoint, log wandb
-- [ ] `src/models/heads.py` (ClsHead, MILHead) — kiểm tra với mọi backbone trong `src/models/`
+- [x] `src/utils/config.py` (đã có), `src/train.py`: vòng train AMP, AdamW + cosine, early stopping theo val AUC, lưu best checkpoint, log wandb
+- [x] `src/models/heads.py` (ClsHead, MILHead) — kiểm tra với mọi backbone trong `src/models/`
 
 **Tuần 2**
-- [ ] `src/extract_features.py`: trích feature snippet → `data/features/<model>/`
-- [ ] `src/data/mil_dataset.py` + `src/train_mil.py` + `src/losses/mil_loss.py`; test trên feature M1
-- [ ] Viết hướng dẫn chạy train/MIL trong README cho cả nhóm
+- [x] `src/extract_features.py`: trích feature snippet → `data/features/<model>/`
+- [ ] `src/data/mil_dataset.py` + `src/train_mil.py` + `src/losses/mil_loss.py`; test trên feature M1 *(code + test dữ liệu giả xong; chờ chạy trên GPU)*
+- [x] Viết hướng dẫn chạy train/MIL trong README cho cả nhóm
 
 **Tuần 3–4 — Mô hình**
 - [ ] Fine-tune **M3 Video Swin-T** chế độ cls (gradient checkpointing / batch nhỏ nếu thiếu VRAM)
