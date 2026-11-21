@@ -14,5 +14,7 @@ wandb
 onnx
 onnxruntime-gpu
 streamlit
+streamlit-webrtc
+av
 psutil
 pytest
