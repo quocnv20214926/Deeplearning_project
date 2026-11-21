@@ -107,16 +107,16 @@
 ## TV4 — Ứng dụng & triển khai + X3D-S
 
 **Tuần 1**
-- [ ] Wireframe giao diện (video + biểu đồ score + bảng sự kiện)
-- [ ] `app/video_source.py`: đọc file/webcam/RTSP trong thread riêng
+- [x] Wireframe giao diện (video + biểu đồ score + bảng sự kiện)
+- [x] `app/video_source.py`: đọc file/webcam/RTSP trong thread riêng
 
 **Tuần 2**
-- [ ] `app/inference.py`: bộ đệm trượt, lấy mẫu 1/10 frame, dùng **cùng transform** của TV1; chạy thử với M1
-- [ ] Pipeline CLI: video vào → file CSV score theo thời gian
+- [x] `app/inference.py`: bộ đệm trượt, lấy mẫu 1/10 frame, dùng **cùng transform** của TV1; chạy thử với M1
+- [x] Pipeline CLI: video vào → file CSV score theo thời gian
 
 **Tuần 3–4 — Mô hình + app v1**
-- [ ] Fine-tune **M4 X3D-S** chế độ cls, rồi chế độ MIL (nếu kịp: MoViNet-A0)
-- [ ] `app/streamlit_app.py` v1: upload video, biểu đồ score, cảnh báo cơ bản
+- [x] Fine-tune **M4 X3D-S** chế độ cls, rồi chế độ MIL (nếu kịp: MoViNet-A0)
+- [x] `app/streamlit_app.py` v1: upload video, biểu đồ score, cảnh báo cơ bản
 
 **Tuần 5 — Triển khai**
 - [ ] `src/export_onnx.py`: FP32/FP16 ONNX + INT8 quantization cho M1/M4; kiểm tra sai lệch output (< 1e-3)
