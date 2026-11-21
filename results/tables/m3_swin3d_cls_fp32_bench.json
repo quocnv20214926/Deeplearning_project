@@ -1,0 +1,26 @@
+{
+  "model": "m3_swin3d",
+  "mode": "cls",
+  "precision": "fp32",
+  "batch": 1,
+  "input_shape": [
+    1,
+    3,
+    16,
+    112,
+    112
+  ],
+  "warmup": 20,
+  "iters": 100,
+  "gpu": "Tesla T4",
+  "device": "cuda",
+  "params_m": 27.861236,
+  "file_mb": 120.42121124267578,
+  "vram_peak_mb": 219.1318359375,
+  "ram_mb": 1254.69140625,
+  "latency_ms_mean": 19.185036630115064,
+  "latency_ms_p95": 19.42599920066641,
+  "latency_ms_std": 0.27223034660575973,
+  "clips_per_s": 52.123955730701276,
+  "fps": 833.9832916912204
+}
